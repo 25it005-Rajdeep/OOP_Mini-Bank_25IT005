@@ -327,6 +327,69 @@ public class MiniBank {
         }
 
         // =====================================
+        // HOUR 12: COLLECTIONS FRAMEWORK
+        // =====================================
+
+        System.out.println("\n===== AccountStore Test =====");
+
+        AccountStore store = new AccountStore();
+
+        // Add accounts to the store
+        for (Account account : accounts) {
+            store.add(account);
+        }
+
+        // Add transaction history
+        store.addTransaction("DEPOSIT,1000");
+        store.addTransaction("WITHDRAW,500");
+
+        // Display all accounts sorted by balance
+        System.out.println("\nAccounts Sorted by Balance:");
+
+        for (Account account : store.sortedByBalance()) {
+            System.out.println(account);
+        }
+
+        // Display transaction history
+        System.out.println("\nTransaction History:");
+
+        for (String transaction : store.getTransactionHistory()) {
+            System.out.println(transaction);
+        }
+
+        // Test account retrieval
+        String searchNumber = accounts[0].getAccountNumber();
+
+        Account foundAccount = store.get(searchNumber);
+
+        if (foundAccount != null) {
+            System.out.println("\nFound Account:");
+            System.out.println(foundAccount);
+        }
+
+        // Test thread-safe account storage
+        System.out.println("\n===== ConcurrentHashMap Test =====");
+
+        TransactionProcessor concurrentProcessor =
+                new TransactionProcessor();
+
+        // Add accounts to ConcurrentHashMap
+        for (Account account : accounts) {
+            concurrentProcessor.addAccount(account);
+        }
+
+        // Retrieve an account
+        Account sharedAccount = concurrentProcessor.getAccount(
+                accounts[0].getAccountNumber()
+        );
+
+        System.out.println("Retrieved from ConcurrentHashMap:");
+        System.out.println(sharedAccount);
+
+        // Stop the processor
+        concurrentProcessor.stop();
+
+        // =====================================
         // MAIN BANKING MENU
         // =====================================
 

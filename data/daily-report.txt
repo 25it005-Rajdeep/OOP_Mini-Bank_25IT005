@@ -1,14 +1,18 @@
 ===== END OF DAY REPORT =====
 
 File: transactions.txt
-Size: 56 bytes
-Last Modified: 2026-11-01T11:16:51.4411432Z
+Size: 112 bytes
+Last Modified: 2026-11-01T11:22:13.0355141Z
+DEPOSIT,1000
+WITHDRAW,500
+DEPOSIT,2000
+WITHDRAW,300
 DEPOSIT,1000
 WITHDRAW,500
 DEPOSIT,2000
 WITHDRAW,300
 
 ===== SUMMARY =====
-Total Deposits: Rs. 3000
-Total Withdrawals: Rs. 800
-Net Amount: Rs. 2200
+Total Deposits: Rs. 6000
+Total Withdrawals: Rs. 1600
+Net Amount: Rs. 4400

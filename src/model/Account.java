@@ -7,7 +7,7 @@ import exception.*;
 import java.io.Serializable;
 
 // Abstract parent class for all account types
-public abstract class Account implements Transactable, InterestBearing, Serializable {
+public abstract class Account implements Transactable, InterestBearing, Serializable, Comparable<Account> {
 
     // Serialization version
     private static final long serialVersionUID = 1L;
@@ -20,6 +20,12 @@ public abstract class Account implements Transactable, InterestBearing, Serializ
 
     @Positive
     private long balance;
+
+    // Compare accounts using account numbers
+    @Override
+    public int compareTo(Account other) {
+        return this.accountNumber.compareTo(other.accountNumber);
+    }
 
     private boolean active;
 
