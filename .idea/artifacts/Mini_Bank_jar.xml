@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Mini Bank:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Mini_Bank_jar</output-path>
+    <root id="archive" name="Mini Bank.jar">
+      <element id="module-output" name="Mini Bank" />
+    </root>
+  </artifact>
+</component>
