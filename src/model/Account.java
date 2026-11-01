@@ -4,10 +4,13 @@ import model.annotation.Id;
 import model.annotation.Positive;
 import model.annotation.MaxLength;
 import exception.*;
+import java.io.Serializable;
 
 // Abstract parent class for all account types
-public abstract class Account implements Transactable, InterestBearing {
+public abstract class Account implements Transactable, InterestBearing, Serializable {
 
+    // Serialization version
+    private static final long serialVersionUID = 1L;
     // Account identification and details
     @Id
     private final String accountNumber;

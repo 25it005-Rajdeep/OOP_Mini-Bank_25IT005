@@ -1,5 +1,9 @@
 import java.util.Scanner;
 
+import java.nio.file.Path;
+import java.nio.file.Files;
+import java.io.IOException;
+
 import model.*;
 import util.AnnotationValidator;
 import service.*;
@@ -273,6 +277,54 @@ public class MiniBank {
 
         System.out.println("Account A Balance: " + accountA.getBalance());
         System.out.println("Account B Balance: " + accountB.getBalance());
+
+        // =====================================
+        // HOUR 11: PERSISTENCE AND REPORTING
+        // =====================================
+
+        System.out.println("\n===== File Persistence Test =====");
+
+        try {
+            // Create folders for storing data and logs
+            Files.createDirectories(Path.of("data"));
+            Files.createDirectories(Path.of("logs"));
+
+            Path accountFile = Path.of("data/accounts.dat");
+
+            // Save accounts
+            StatePersister.save(accounts, accountFile);
+
+            // Load accounts into a new array
+            Account[] loadedAccounts = StatePersister.load(accountFile);
+
+            // Display loaded accounts
+            System.out.println("\nLoaded Accounts:");
+
+            for (Account account : loadedAccounts) {
+                System.out.println(account);
+            }
+
+            // Add transaction records to the log
+            Path logFile = Path.of("logs/transactions.txt");
+
+            TransactionLog.append(logFile, "DEPOSIT,1000");
+            TransactionLog.append(logFile, "WITHDRAW,500");
+            TransactionLog.append(logFile, "DEPOSIT,2000");
+            TransactionLog.append(logFile, "WITHDRAW,300");
+
+            // Generate end-of-day report
+            Path reportFile = Path.of("data/daily-report.txt");
+
+            ReportGenerator.generate(Path.of("logs"), reportFile);
+
+            // Display generated report
+            System.out.println("\n===== Daily Report =====");
+
+            System.out.println(Files.readString(reportFile));
+
+        } catch (IOException e) {
+            System.out.println("File operation error: " + e.getMessage());
+        }
 
         // =====================================
         // MAIN BANKING MENU
