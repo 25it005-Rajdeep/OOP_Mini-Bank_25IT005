@@ -390,6 +390,39 @@ public class MiniBank {
         concurrentProcessor.stop();
 
         // =====================================
+        // HOUR 13: GENERIC REPOSITORY
+        // =====================================
+
+        System.out.println("\n===== Generic Repository Test =====");
+
+        // Create repository for Account objects
+        Repository<Account> accountRepository = new Repository<>();
+
+        // Save multiple accounts
+        accountRepository.saveAll(accounts);
+
+        // Fetch account using account number
+        String id = accounts[0].getAccountNumber();
+
+        Account savedAccount = accountRepository.findById(id);
+
+        System.out.println("\nAccount Found:");
+        System.out.println(savedAccount);
+
+        // Display all accounts
+        System.out.println("\nAll Repository Accounts:");
+
+        for (Account account : accountRepository.findAll()) {
+            System.out.println(account);
+        }
+
+        // Test bounded generic method
+        Integer[] numbers = {10, 20, 30, 40};
+
+        System.out.println("Average: "
+                + Repository.average(numbers));
+
+        // =====================================
         // MAIN BANKING MENU
         // =====================================
 
