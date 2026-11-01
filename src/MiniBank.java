@@ -1,179 +1,109 @@
-import model.*;
-// Import account classes
-import model.Account;
-import model.SavingsAccount;
-import model.CurrentAccount;
-import model.FixedDepositAccount;
-
-// Import utility classes
-import service.AccountWorker;
-import service.BankSession;
-import util.* ;
-
-// Import withdrawal rule
-import service.WithdrawRule;
-
-// Static import example
-import static java.lang.System.out;
 import java.util.Scanner;
+
+import model.*;
+import util.AnnotationValidator;
+import service.*;
 import exception.*;
 
+// Main class of MiniBank application
 public class MiniBank {
 
-    public static void main(String[] args) {
-        BankInfo bank = new BankInfo("MiniBank", "ITFive Branch");
-        Scanner sc = new Scanner(System.in);
-        System.out.println("================================");
-        System.out.println("       " + bank.name());
-        System.out.println("       " + bank.branch());
-        System.out.println("================================");
+    // Bank information
+    record BankInfo(String name, String branch) {}
 
+    // Menu options
+    enum MenuOption {
+        OPEN_ACCOUNT, DEPOSIT, WITHDRAW, TRANSFER, EXIT
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        // Display bank information
+        BankInfo bank = new BankInfo("MiniBank", "ITFive");
+
+        System.out.println("===== " + bank.name() + " =====");
+        System.out.println("Branch: " + bank.branch());
+
+        // Create different types of accounts
         Account[] accounts = {
                 new SavingsAccount("Rajdeep", 5000, 1000),
                 new CurrentAccount("Rahul", 3000, 2000),
                 new FixedDepositAccount("Amit", 10000)
         };
-        // Test annotation validation
-        System.out.println("\n===== Annotation Validation =====");
 
-        // Negative balance for testing
-        Account testAccount =
-                new SavingsAccount("TestCustomer", -500, 0);
-
-        // Validate the account
-        String[] errors = AnnotationValidator.validate(testAccount);
-
-        // Print validation errors
-        for (String error : errors) {
-            System.out.println("Error: " + error);
-        }
-
-        System.out.println("\n===== Anonymous Class =====");
-        WithdrawRule rule1 = new WithdrawRule() {
-            @Override
-            public boolean allow(Account account, long amount) {
-                return account.canWithdraw(amount);
-            }
-        };
-
-        System.out.println("Withdrawal allowed: " + rule1.allow(accounts[0], 1000));
-
-        System.out.println("\n===== Lambda Expression =====");
-        WithdrawRule rule2 = (account, amount) -> account.canWithdraw(amount);
-
-        System.out.println("Withdrawal allowed: " + rule2.allow(accounts[0], 1000));
-
-        System.out.println("\n===== Yearly Interest =====");
-
-        for (Account account : accounts) {
-            System.out.println(account.getOwnerName() + ": Rs. " + account.yearlyInterest());
-        }
-
-        System.out.println("\n===== model.Account Interest Rates =====");
-        for (Account account : accounts) {
-
-            System.out.println(account.getOwnerName() + " Interest Rate: " + account.interestRate() + "%");
-
-            if (account instanceof SavingsAccount savings) {
-                System.out.println("This is a Savings model.Account.");
-                System.out.println("Balance: Rs. " + savings.getBalance());
-            }
-        }
-
-        // Perform banking transactions
-        System.out.println("\n===== Transactions =====");
-
-        try {
-
-            accounts[0].deposit(1000);
-
-            accounts[1].withdraw(500);
-
-            accounts[2].withdraw(1000);
-
-            accounts[2].deposit(2000);
-
-            // Transfer money between accounts
-            accounts[0].transfer(accounts[1], 500);
-
-        } catch (InsufficientFundsException e) {
-
-            System.out.println("Error: " + e.getMessage());
-            System.out.println("Shortfall: Rs. " + e.getShortfall());
-
-        } catch (InvalidAmountException e) {
-
-            System.out.println("Error: " + e.getMessage());
-
-        } catch (BankException e) {
-
-            System.out.println("Bank Error: " + e.getMessage());
-
-        } finally {
-
-            System.out.println("Transaction processing finished.");
-        }
-
-        System.out.println("\n===== model.Account Details =====");
-
-        for (Account account : accounts) {
-            System.out.println("model.Account Number: " + account.getAccountNumber());
-            System.out.println("Owner: " + account.getOwnerName());
-            System.out.println("Balance: Rs. " + account.getBalance());
-            System.out.println("-------------------------");
-        }
-
-        System.out.println("\n===== toString() Test =====");
+        // Display account details
+        System.out.println("\n===== Account Details =====");
 
         for (Account account : accounts) {
             System.out.println(account);
         }
 
-        System.out.println("\n===== equals() Test =====");
-        System.out.println("model.Account 1 equals model.Account 2: " + accounts[0].equals(accounts[1]));
+        // Demonstrate polymorphism
+        System.out.println("\n===== Interest Rates =====");
 
-        System.out.println("\n===== instanceof Test =====");
-        System.out.println("Is model.Account object? " + (accounts[0] instanceof Account));
+        for (Account account : accounts) {
+            System.out.println(
+                    account.getOwnerName() + ": "
+                            + account.interestRate() + "%"
+            );
+        }
 
-        // Try-with-resources example
+        // Test banking transactions
+        System.out.println("\n===== Transactions =====");
+
+        try {
+            accounts[0].deposit(1000);
+            accounts[1].withdraw(500);
+            accounts[2].withdraw(1000);
+            accounts[2].deposit(2000);
+
+            accounts[0].transfer(accounts[1], 500);
+
+        } catch (InsufficientFundsException e) {
+            System.out.println("Error: " + e.getMessage());
+            System.out.println("Shortfall: Rs. " + e.getShortfall());
+
+        } catch (InvalidAmountException e) {
+            System.out.println("Error: " + e.getMessage());
+
+        } catch (BankException e) {
+            System.out.println("Bank Error: " + e.getMessage());
+
+        } finally {
+            System.out.println("Transaction processing finished.");
+        }
+
+        // Test annotation validation
+        System.out.println("\n===== Annotation Validation =====");
+
+        Account testAccount =
+                new SavingsAccount("TestCustomer", -500, 0);
+
+        String[] errors = AnnotationValidator.validate(testAccount);
+
+        for (String error : errors) {
+            System.out.println("Error: " + error);
+        }
+
+        // Test automatic resource closing
         System.out.println("\n===== Bank Session =====");
 
         try (BankSession session = new BankSession()) {
-
             System.out.println("Performing banking operations...");
-
         } catch (Exception e) {
-
             System.out.println("Error: " + e.getMessage());
         }
 
-        int choice;
-
-        System.out.println("\n===== util.Validator Testing =====");
-
-        System.out.println("Valid Mobile: " + Validator.isValidMobile("9876543210"));
-        System.out.println("Invalid Mobile: " + Validator.isValidMobile("12345"));
-
-        System.out.println("Valid Email: " + Validator.isValidEmail("test@gmail.com"));
-        System.out.println("Invalid Email: " + Validator.isValidEmail("testgmail.com"));
-
-        System.out.println("Valid PAN: " + Validator.isValidPan("ABCDE1234F"));
-        System.out.println("Invalid PAN: " + Validator.isValidPan("12345"));
-
-        System.out.println("Valid IFSC: " + Validator.isValidIfsc("SBIN0001234"));
-        System.out.println("Invalid IFSC: " + Validator.isValidIfsc("12345"));
-
-        System.out.println("\n===== model.Command Parser Testing =====");
-        Command command = CommandParser.parse("DEPOSIT AC0001 500");
-
-        System.out.println("Type: " + command.type());
-        System.out.println("model.Account Number: " + command.accountNumber());
-        System.out.println("Amount: " + command.amount());
-        System.out.println("\n===== Statement Testing =====");
+        // =====================================
+        // HOUR 9: MULTITHREADING
+        // =====================================
 
         System.out.println("\n===== Multithreading Test =====");
 
-        Account raceAccount = new SavingsAccount("Thread Test", 0, 0);
+        Account raceAccount =
+                new SavingsAccount("Thread Test", 0, 0);
 
         int threadCount = 10;
         int times = 1000;
@@ -183,7 +113,12 @@ public class MiniBank {
 
         // Create and start 10 threads
         for (int i = 0; i < threadCount; i++) {
-            threads[i] = new Thread(new AccountWorker(raceAccount, times, amount), "Worker-" + (i + 1));
+
+            threads[i] = new Thread(
+                    new AccountWorker(raceAccount, times, amount),
+                    "Worker-" + (i + 1)
+            );
+
             threads[i].start();
         }
 
@@ -202,53 +137,175 @@ public class MiniBank {
 
         System.out.println("Actual Balance: "
                 + raceAccount.getBalance());
-        System.out.println(StatementFormatter.buildStatement(accounts[0]));
+
+        // =====================================
+        // HOUR 10: EXECUTOR SERVICE
+        // =====================================
+
+        System.out.println("\n===== ExecutorService Test =====");
+
+        Account taskAccount =
+                new SavingsAccount("Executor Test", 5000, 0);
+
+        TransactionProcessor processor =
+                new TransactionProcessor();
+
+        // Submit 10 deposit tasks
+        for (int i = 0; i < 10; i++) {
+
+            processor.submit(() -> {
+                try {
+                    taskAccount.deposit(100);
+                } catch (BankException e) {
+                    System.out.println("Error: " + e.getMessage());
+                }
+            });
+        }
+
+        // Submit 5 withdrawal tasks
+        for (int i = 0; i < 5; i++) {
+
+            processor.submit(() -> {
+                try {
+                    taskAccount.withdraw(50);
+                } catch (BankException e) {
+                    System.out.println("Error: " + e.getMessage());
+                }
+            });
+        }
+
+        // Wait for all tasks to finish
+        processor.stop();
+
+        System.out.println("Final Balance: Rs. "
+                + taskAccount.getBalance());
+
+        // =====================================
+        // HOUR 10: PRODUCER-CONSUMER
+        // =====================================
+
+        System.out.println("\n===== Producer-Consumer Test =====");
+
+        TransactionBuffer buffer = new TransactionBuffer();
+
+        Account bufferAccount =
+                new SavingsAccount("Buffer Test", 5000, 0);
+
+        // Producer creates and adds transactions
+        Thread producer = new Thread(() -> {
+
+            try {
+                for (int i = 0; i < 5; i++) {
+
+                    buffer.put(() -> {
+                        try {
+                            bufferAccount.deposit(100);
+                            System.out.println("Transaction processed.");
+                        } catch (BankException e) {
+                            System.out.println("Error: " + e.getMessage());
+                        }
+                    });
+                }
+
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+
+            } finally {
+                buffer.finish();
+                System.out.println("Producer finished.");
+            }
+
+        }, "Producer");
+
+        // Consumer takes and processes transactions
+        Thread consumer = new Thread(() -> {
+
+            try {
+                Runnable task;
+
+                while ((task = buffer.take()) != null) {
+                    task.run();
+                }
+
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+            System.out.println("Consumer finished.");
+
+        }, "Consumer");
+
+        // Start both threads
+        producer.start();
+        consumer.start();
+
+        // Wait for both threads
+        try {
+            producer.join();
+            consumer.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        System.out.println("Final Buffer Account Balance: Rs. "
+                + bufferAccount.getBalance());
+
+        // =====================================
+        // HOUR 10: DEADLOCK DEMONSTRATION
+        // =====================================
+
+        System.out.println("\n===== Deadlock Demonstration =====");
+
+        Account accountA = new SavingsAccount("Account A", 5000, 0);
+        Account accountB = new SavingsAccount("Account B", 5000, 0);
+
+        // Demonstrate opposite-order locking
+        DeadlockDemo.demonstrate(accountA, accountB);
+
+        // Test the corrected transfer method
+        System.out.println("\n===== Deadlock Prevention Test =====");
+
+        try {
+            accountA.transfer(accountB, 500);
+        } catch (BankException e) {
+            System.out.println("Transfer Error: " + e.getMessage());
+        }
+
+        System.out.println("Account A Balance: " + accountA.getBalance());
+        System.out.println("Account B Balance: " + accountB.getBalance());
+
+        // =====================================
+        // MAIN BANKING MENU
+        // =====================================
+
+        int choice;
+
         do {
             System.out.println("\n===== MiniBank Menu =====");
-            System.out.println("1. Open model.Account");
+            System.out.println("1. Open Account");
             System.out.println("2. Deposit");
             System.out.println("3. Withdraw");
             System.out.println("4. Transfer");
             System.out.println("5. Exit");
 
             System.out.print("Enter your choice: ");
+
             choice = sc.nextInt();
 
-            switch (choice) {
-                case 1:
-                    System.out.println("Open model.Account");
-                    break;
+            // Handle menu selection
+            String result = switch (choice) {
+                case 1 -> "Open Account - Coming Soon";
+                case 2 -> "Deposit - Coming Soon";
+                case 3 -> "Withdraw - Coming Soon";
+                case 4 -> "Transfer - Coming Soon";
+                case 5 -> "Goodbye! Thank you for using MiniBank.";
+                default -> "Invalid Choice! Please try again.";
+            };
 
-                case 2:
-                    System.out.println("Deposit");
-                    break;
-
-                case 3:
-                    System.out.println("Withdraw");
-                    break;
-
-                case 4:
-                    System.out.println("Transfer");
-                    break;
-
-                case 5:
-                    System.out.println("Thank you for using R's Bank.\nHave a nice day...!!");
-                    break;
-
-                default:
-                    System.out.println("Invalid Choice");
-            }
+            System.out.println(result);
 
         } while (choice != 5);
+
         sc.close();
-    }
-    record BankInfo(String name, String branch) {
-    }
-    enum MenuOption {
-        OPEN_ACCOUNT,
-        DEPOSIT,
-        WITHDRAW,
-        TRANSFER,
-        EXIT
     }
 }

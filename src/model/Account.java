@@ -73,34 +73,40 @@ public abstract class Account implements Transactable, InterestBearing {
         return true;
     }
 
-    // Transfer money to another account
+    // Transfer money using a consistent locking order
     public void transfer(Account to, long amount) throws BankException {
 
-        try {
+        if (to == null) {
+            throw new AccountNotFoundException(
+                    "Destination account not found.");
+        }
 
-            // Check destination account
-            if (to == null) {
-                throw new AccountNotFoundException(
-                        "Destination account not found.");
+        // Decide which account to lock first
+        Account firstLock = this;
+        Account secondLock = to;
+
+        if (this.accountNumber.compareTo(to.accountNumber) > 0) {
+            firstLock = to;
+            secondLock = this;
+        }
+
+        // Always lock accounts in the same order
+        synchronized (firstLock) {
+            synchronized (secondLock) {
+
+                try {
+                    withdraw(amount);
+                    to.deposit(amount);
+
+                    System.out.println("Transfer successful.");
+
+                } catch (BankException e) {
+                    throw e;
+
+                } finally {
+                    System.out.println("Transfer operation completed.");
+                }
             }
-
-            // Withdraw from current account
-            withdraw(amount);
-
-            // Deposit into destination account
-            to.deposit(amount);
-
-            System.out.println("Transfer successful.");
-
-        } catch (BankException e) {
-
-            // Rethrow the bank exception
-            throw e;
-
-        } finally {
-
-            // This block always executes
-            System.out.println("Transfer operation completed.");
         }
     }
 
