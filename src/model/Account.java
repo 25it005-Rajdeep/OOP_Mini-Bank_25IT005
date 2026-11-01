@@ -43,7 +43,7 @@ public abstract class Account implements Transactable, InterestBearing {
 
     // Deposit money into the account
     @Override
-    public void deposit(long amount) throws InvalidAmountException {
+    public synchronized void deposit(long amount) throws InvalidAmountException {
 
         if (amount <= 0) {
             throw new InvalidAmountException(
@@ -51,14 +51,11 @@ public abstract class Account implements Transactable, InterestBearing {
         }
 
         balance += amount;
-        System.out.println("Amount deposited successfully.");
     }
 
     // Withdraw money from the account
     @Override
-    public boolean withdraw(long amount)
-            throws InsufficientFundsException, InvalidAmountException {
-
+    public synchronized boolean withdraw(long amount) throws InsufficientFundsException, InvalidAmountException {
         if (amount <= 0) {
             throw new InvalidAmountException(
                     "Withdrawal amount must be greater than zero.");

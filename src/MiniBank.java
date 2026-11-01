@@ -6,6 +6,7 @@ import model.CurrentAccount;
 import model.FixedDepositAccount;
 
 // Import utility classes
+import service.AccountWorker;
 import service.BankSession;
 import util.* ;
 
@@ -170,6 +171,37 @@ public class MiniBank {
         System.out.println("Amount: " + command.amount());
         System.out.println("\n===== Statement Testing =====");
 
+        System.out.println("\n===== Multithreading Test =====");
+
+        Account raceAccount = new SavingsAccount("Thread Test", 0, 0);
+
+        int threadCount = 10;
+        int times = 1000;
+        long amount = 1;
+
+        Thread[] threads = new Thread[threadCount];
+
+        // Create and start 10 threads
+        for (int i = 0; i < threadCount; i++) {
+            threads[i] = new Thread(new AccountWorker(raceAccount, times, amount), "Worker-" + (i + 1));
+            threads[i].start();
+        }
+
+        // Wait for all threads to finish
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+
+        System.out.println("Expected Balance: "
+                + (threadCount * times * amount));
+
+        System.out.println("Actual Balance: "
+                + raceAccount.getBalance());
         System.out.println(StatementFormatter.buildStatement(accounts[0]));
         do {
             System.out.println("\n===== MiniBank Menu =====");
